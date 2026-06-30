@@ -3,9 +3,12 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:asdf@localhost:5432/review_db")
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+if not DATABASE_URL:
+    raise ValueError("DATABASE_URL environment variable is not set")
+
+if DATABASE_URL.startswith("postgres://"):
     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
 engine = create_engine(DATABASE_URL)
@@ -19,3 +22,4 @@ def get_db():
         yield db
     finally:
         db.close()
+
