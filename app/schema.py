@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, Field, EmailStr, field_validator
 from typing import List, Optional
 from datetime import datetime
 
@@ -60,5 +60,22 @@ class ProductResponse(ProductBase):
     class Config:
         from_attributes = True
 
+class ProductReviewResponse(BaseModel):
+    id: int
+    rating: int
+    comment: str
+    created_at: datetime
+    user: str  # Direct string representing user.name to match PDF specification
+
+    class Config:
+        from_attributes = True
+
+    @field_validator('user', mode='before')
+    @classmethod
+    def get_user_name(cls, v):
+        if hasattr(v, 'name'):
+            return v.name
+        return str(v)
+
 class ProductDetailResponse(ProductResponse):
-    reviews: List[ReviewResponse] = []
+    reviews: List[ProductReviewResponse] = []
